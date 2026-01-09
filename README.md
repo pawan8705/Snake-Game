@@ -40,8 +40,8 @@ A fully-featured, professionally crafted Snake game built with modern web techno
 ## 📦 Project Structure
 
 -snake-game/
--├── index.html # Main application entry point
--├── style.css # Custom styles and animations
--├── script.js # Game logic and controllers
--├── README.md # Project documentation
--└── assets/ # Game assets and resources
+-├── index.html # Main application entry point.
+-├── style.css # Custom styles and animations.
+-├── script.js # Game logic and controllers.
+-├── README.md # Project documentation.
+-└── assets/ # Game assets and resources.
