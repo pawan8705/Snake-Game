@@ -2,9 +2,6 @@
 
 A fully-featured, professionally crafted Snake game built with modern web technologies. This implementation showcases advanced front-end development techniques with smooth animations, responsive design, and intuitive gameplay mechanics.
 
-## 🎮 Live Demo
-[Link to live deployment]
-
 ## ✨ Features
 
 ### 🎯 Core Gameplay
@@ -41,3 +38,10 @@ A fully-featured, professionally crafted Snake game built with modern web techno
 - **Responsive Design**: Mobile-first responsive architecture
 
 ## 📦 Project Structure
+
+snake-game/
+├── index.html # Main application entry point
+├── style.css # Custom styles and animations
+├── script.js # Game logic and controllers
+├── README.md # Project documentation
+└── assets/ # Game assets and resources
