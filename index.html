@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Snake Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="text-center mb-6 md:mb-8 px-4">
+        <h1 class="game-title mb-3 md:mb-4 text-green-400">SNAKE GAME</h1>
+        <p class="text-base md:text-lg text-slate-300 max-w-2xl mx-auto">Eat the food, grow longer, avoid collisions and walls!</p>
+    </header>
+    
+    <main class="flex-1">
+        <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 items-center lg:items-start max-w-6xl mx-auto">
+            <!-- Left Column - Game Board -->
+            <div class="flex-1 w-full">
+                <!-- Score Cards -->
+                <div class="flex justify-center gap-4 md:gap-6 mb-6 px-4">
+                    <div class="score-card text-center">
+                        <p class="text-sm text-slate-400 mb-1">SCORE</p>
+                        <p id="score" class="text-2xl md:text-3xl font-bold text-green-400">0</p>
+                    </div>
+                    
+                    <div class="score-card text-center">
+                        <p class="text-sm text-slate-400 mb-1">HIGH SCORE</p>
+                        <p id="high-score" class="text-2xl md:text-3xl font-bold text-yellow-400">0</p>
+                    </div>
+                    
+                    <div class="score-card text-center">
+                        <p class="text-sm text-slate-400 mb-1">LEVEL</p>
+                        <p id="level" class="text-2xl md:text-3xl font-bold text-blue-400">1</p>
+                    </div>
+                </div>
+                
+                <!-- Game Board -->
+                <div class="game-board p-3 md:p-4">
+                    <div id="game-grid" class="grid"></div>
+                    
+                    <!-- Start Screen -->
+                    <div id="start-screen" class="screen-overlay">
+                        <h2 class="game-title text-3xl md:text-4xl text-green-400 mb-4 md:mb-6">SNAKE GAME</h2>
+                        <div class="bg-slate-800 p-4 md:p-6 rounded-xl mb-6 md:mb-8 max-w-md w-full">
+                            <h3 class="text-xl font-bold mb-3 md:mb-4 text-yellow-400">How to Play</h3>
+                            <ul class="space-y-2 md:space-y-3 text-slate-300 text-sm md:text-base">
+                                <li class="flex items-start">
+                                    <i class="fas fa-arrow-up mt-1 mr-3 text-green-400 flex-shrink-0"></i>
+                                    <span>Use arrow keys or on-screen buttons to control the snake</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-apple-alt mt-1 mr-3 text-red-400 flex-shrink-0"></i>
+                                    <span>Eat the red food to grow and earn points</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-skull-crossbones mt-1 mr-3 text-red-500 flex-shrink-0"></i>
+                                    <span>Avoid hitting walls or the snake's own body</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-tachometer-alt mt-1 mr-3 text-blue-400 flex-shrink-0"></i>
+                                    <span>Speed increases every 5 foods collected</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <button id="start-btn" class="button-primary text-lg md:text-xl py-3 md:py-4 px-8 md:px-12">
+                            <i class="fas fa-play mr-2"></i> START GAME
+                        </button>
+                    </div>
+                    
+                    <!-- Game Over Screen -->
+                    <div id="game-over-screen" class="screen-overlay hidden">
+                        <h2 class="game-title text-3xl md:text-4xl text-red-500 mb-4">GAME OVER</h2>
+                        <p class="text-xl md:text-2xl mb-2">Your Score: <span id="final-score" class="text-green-400">0</span></p>
+                        <p class="text-lg md:text-xl mb-6 md:mb-8 text-slate-300">High Score: <span id="final-high-score" class="text-yellow-400">0</span></p>
+                        <button id="restart-btn" class="button-primary text-lg md:text-xl py-3 md:py-4 px-8 md:px-12">
+                            <i class="fas fa-redo mr-2"></i> PLAY AGAIN
+                        </button>
+                    </div>
+                    
+                    <!-- Pause Screen -->
+                    <div id="pause-screen" class="screen-overlay hidden">
+                        <h2 class="game-title text-3xl md:text-4xl text-yellow-500 mb-6 md:mb-8">GAME PAUSED</h2>
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <button id="resume-btn" class="button-primary text-lg py-3 md:py-4 px-8">
+                                <i class="fas fa-play mr-2"></i> RESUME
+                            </button>
+                            <button id="restart-pause-btn" class="button-secondary text-lg py-3 md:py-4 px-8">
+                                <i class="fas fa-redo mr-2"></i> RESTART
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Game Controls -->
+                <div class="mt-6 md:mt-8 px-4">
+                    <div class="controls-container grid grid-cols-3 gap-3 md:gap-4 max-w-xs md:max-w-sm mx-auto">
+                        <div></div>
+                        <button id="up-btn" class="control-btn bg-slate-800 hover:bg-slate-700 p-3 md:p-4 rounded-xl flex justify-center items-center">
+                            <i class="fas fa-arrow-up text-xl md:text-2xl"></i>
+                        </button>
+                        <button id="pause-btn" class="control-btn bg-yellow-600 hover:bg-yellow-700 p-3 md:p-4 rounded-xl flex justify-center items-center">
+                            <i class="fas fa-pause text-xl md:text-2xl"></i>
+                        </button>
+                        
+                        <button id="left-btn" class="control-btn bg-slate-800 hover:bg-slate-700 p-3 md:p-4 rounded-xl flex justify-center items-center">
+                            <i class="fas fa-arrow-left text-xl md:text-2xl"></i>
+                        </button>
+                        <button id="down-btn" class="control-btn bg-slate-800 hover:bg-slate-700 p-3 md:p-4 rounded-xl flex justify-center items-center">
+                            <i class="fas fa-arrow-down text-xl md:text-2xl"></i>
+                        </button>
+                        <button id="right-btn" class="control-btn bg-slate-800 hover:bg-slate-700 p-3 md:p-4 rounded-xl flex justify-center items-center">
+                            <i class="fas fa-arrow-right text-xl md:text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Game Info -->
+            <div class="game-info bg-slate-800 p-5 md:p-6 rounded-2xl shadow-lg w-full lg:w-96 mt-4 lg:mt-0">
+                <h3 class="text-xl md:text-2xl font-bold mb-5 md:mb-6 text-green-400 border-b border-slate-700 pb-3">Game Status</h3>
+                
+                <div class="space-y-4 md:space-y-6">
+                    <div>
+                        <h4 class="font-bold text-lg mb-2 text-blue-400">Speed Level</h4>
+                        <div class="flex items-center justify-between bg-slate-900 p-3 rounded-xl">
+                            <span class="text-slate-300">Current:</span>
+                            <span id="speed-display" class="font-bold text-green-400">Normal</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-bold text-lg mb-2 text-purple-400">Progress</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between bg-slate-900 p-3 rounded-xl">
+                                <span class="text-slate-300">Foods eaten:</span>
+                                <span id="foods-eaten" class="font-bold text-red-400">0</span>
+                            </div>
+                            <div class="flex justify-between bg-slate-900 p-3 rounded-xl">
+                                <span class="text-slate-300">Snake length:</span>
+                                <span id="snake-length" class="font-bold text-purple-400">3</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-bold text-lg mb-3 text-yellow-400">Controls Guide</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                                    <i class="fas fa-arrow-up text-green-400"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium">Arrow Keys / Buttons</p>
+                                    <p class="text-sm text-slate-400">Control snake direction</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                                    <span class="font-bold text-green-400">P</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium">P Key / Pause Button</p>
+                                    <p class="text-sm text-slate-400">Pause/Resume game</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                                    <span class="font-bold text-green-400">R</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium">R Key / Space</p>
+                                    <p class="text-sm text-slate-400">Restart game</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="text-center mt-8 md:mt-10 pt-6 border-t border-slate-700 px-4">
+        <p class="text-slate-400 text-sm md:text-base">Built with HTML, CSS, JavaScript, GSAP & Tailwind CSS</p>
+        <p class="text-slate-500 text-xs md:text-sm mt-2">Use arrow keys, on-screen buttons, or swipe to play</p>
+    </footer>
+
+<script src="script.js"></script>
+</body>
+</html>
